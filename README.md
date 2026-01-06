@@ -7,8 +7,7 @@ The goal is to send/share XKCD comics in a easier way.
 
 You obviously need Scala and SBT to make it run.
 
-All you need to make it run is a mongoDB server (> 3.x) and a [Telegram Bot key](https://core.telegram.org/bots), this token must be placed into a 
-file at the root of the project.
+All you need to make it run is a mongoDB server (> 3.x) and a [Telegram Bot key](https://core.telegram.org/bots), this token must be placed into a `telegram.key` file at the root of the project.
 
 The first step is to fill the database:
 
@@ -27,6 +26,15 @@ You can search and post XKCD comics using the inline features of the bot ```@xkc
 then it will display the latest XKCD (ordered by date). 
 Currently, the number of results is limiter to 50.
 
+To enable the inline search for your bot, do the following:
+
+1. Open chat with @BotFather
+2. Send: /mybots
+3. Select your bot
+4. Click "Bot Settings"
+5. Click "Inline Mode"
+6. Click "Turn on" (if it says "Turn off", it's already on)
+
 If you add the bot to a group, it will then automatically publish every new XKCD as soon as it's available.
 
 ### JAR
@@ -36,28 +44,24 @@ When deploying the JAR, do not forget to send the ```telegram.key``` file as wel
  
 ### Docker
 
-The easiest way to run your own copy of this bot (why would you even need to do that ??) is to use the docker image available [here](https://hub.docker.com/r/ex0ns/inlinexkcd/).
-You'll need to pass `TELEGRAM_KEY` environment variable to docker for the bot to work.
+**Note:** The Docker Hub image `ex0ns/inlinexkcd:latest` is deprecated. It's recommended to build the local image instead.
 
-In order for the docker to connect to the database on localhost, you must run it with `--net=host` option. 
-You can also give `DB_URL` and `DB_PORT` environment variables to connect to a mongoDB server.
+The easiest way to run your own copy of this bot is to use docker-compose, which will build the bot from source and deploy it alongside a MongoDB container.
 
+1. Set up your environment file:
 ```bash
-# Using a mongoDB instance on host
-docker run -e "TELEGRAM_KEY=$(cat telegram.key)" --net=host --name inlinexkcd ex0ns/inlinexkcd:latest
-# Using a remote mongoDB intance
-sudo docker run -e "TELEGRAM_KEY=$(cat telegram.key) DB_URL=10.0.1.1 DB_PORT=27017" --name inlinexkcd ex0ns/inlinexkcd:latest
+cd docker
+cp .env.dist .env
+# Edit .env and add your TELEGRAM_KEY
 ```
 
-We use [docker-compose](https://docs.docker.com/compose/) to deploy a new MongoDB container as well as one running the actual bot.
-If you cloned the repo, then simply run `sbt dockerComposeUp` to run docker compose and deploy the two new containers.
-
-Otherwise you could just get a copy of the [dockerfile](https://raw.githubusercontent.com/ex0ns/telegram_XKCD_ibot/master/docker/docker-compose.yml) and run:
-
+2. Build and run using either:
 ```bash
-wget https://raw.githubusercontent.com/ex0ns/telegram_XKCD_ibot/master/docker/docker-compose.yml
-TELEGRAM_KEY=$(cat telegram.key) docker-compose up
+cd docker
+docker-compose up --build
 ```
+
+The bot will automatically parse all XKCD comics on first startup if the database is empty.
 
 ### Testing
 
