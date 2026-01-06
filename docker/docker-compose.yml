@@ -1,11 +1,20 @@
-InlineXKCD:
-  image: ex0ns/inlinexkcd:latest
-  environment:
+services:
+  inline-xkcd:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    environment:
       DB_URL: db
       DB_PORT: 27017
       TELEGRAM_KEY: "${TELEGRAM_KEY}"
-  links:
-   - db
-db:
-  image: mongo:3.0.2
-  command: --smallfiles
+    links:
+      - db
+  db:
+    image: mongo:6.0.27
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
