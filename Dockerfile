@@ -14,6 +14,6 @@ RUN sbt assembly
 FROM eclipse-temurin:11-jre-jammy
 
 WORKDIR /app
-COPY --from=builder /build/target/scala-2.13/InlineXKCD-assembly-0.1.jar /app/bot.jar
+COPY --from=builder /build/target/scala-2.13/ComicBot-assembly-0.1.jar /app/bot.jar
 
 ENTRYPOINT ["java", "-jar", "/app/bot.jar"]

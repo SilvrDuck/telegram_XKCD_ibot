@@ -1,8 +1,8 @@
-package me.ex0ns.inlinexkcd.database
+package me.ex0ns.comicbot.database
 
 import com.typesafe.scalalogging.Logger
-import me.ex0ns.inlinexkcd.helpers.DocumentHelpers._
-import me.ex0ns.inlinexkcd.models.Comic
+import me.ex0ns.comicbot.helpers.DocumentHelpers._
+import me.ex0ns.comicbot.models.Comic
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
 import org.mongodb.scala._
 import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
@@ -24,7 +24,7 @@ final object Comics extends Collection[Comic] with Database {
   private val codecRegistry = fromRegistries(fromProviders(classOf[Comic]), DEFAULT_CODEC_REGISTRY)
   private val codecDB = database.withCodecRegistry(codecRegistry)
 
-  override val collection: MongoCollection[Comic] = codecDB.getCollection("comics")
+  override val collection: MongoCollection[Comic] = codecDB.getCollection("strips")
   override val logger = Logger(LoggerFactory.getLogger(Comics.getClass))
 
   /**

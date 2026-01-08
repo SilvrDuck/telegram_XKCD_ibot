@@ -1,6 +1,6 @@
-package me.ex0ns.inlinexkcd.comics.xkcd
+package me.ex0ns.comicbot.comics.xkcd
 
-import me.ex0ns.inlinexkcd.config.BotConfig
+import me.ex0ns.comicbot.config.BotConfig
 
 object XKCDConfig {
   val config: BotConfig = BotConfig(

@@ -1,4 +1,4 @@
-package me.ex0ns.inlinexkcd.config
+package me.ex0ns.comicbot.config
 
 /**
   * Configuration for a comic bot instance

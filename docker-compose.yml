@@ -1,5 +1,5 @@
 services:
-  inline-xkcd:
+  comic-bot:
     build:
       dockerfile: Dockerfile
     environment:

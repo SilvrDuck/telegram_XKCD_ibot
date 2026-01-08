@@ -1,9 +1,9 @@
-package me.ex0ns.inlinexkcd
+package me.ex0ns.comicbot
 
-import me.ex0ns.inlinexkcd.bot.InlineComicBot
-import me.ex0ns.inlinexkcd.config.BotConfig
-import me.ex0ns.inlinexkcd.parser.ComicParser
-import me.ex0ns.inlinexkcd.comics.xkcd.{XKCDConfig, XKCDParser}
+import me.ex0ns.comicbot.bot.InlineComicBot
+import me.ex0ns.comicbot.config.BotConfig
+import me.ex0ns.comicbot.parser.ComicParser
+import me.ex0ns.comicbot.comics.xkcd.{XKCDConfig, XKCDParser}
 
 import scala.io.Source
 import scala.util.Properties

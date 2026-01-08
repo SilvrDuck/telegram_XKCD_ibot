@@ -1,4 +1,4 @@
-package me.ex0ns.inlinexkcd.helpers
+package me.ex0ns.comicbot.helpers
 
 object StringHelpers {
 

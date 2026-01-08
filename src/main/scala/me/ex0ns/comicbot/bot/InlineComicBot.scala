@@ -1,4 +1,4 @@
-package me.ex0ns.inlinexkcd.bot
+package me.ex0ns.comicbot.bot
 
 import com.bot4s.telegram.api.RequestHandler
 import com.bot4s.telegram.api.declarative.Commands
@@ -9,12 +9,12 @@ import com.bot4s.telegram.models._
 import fs2.Stream
 import sttp.client3._
 import sttp.client3.asynchttpclient.future.AsyncHttpClientFutureBackend
-import me.ex0ns.inlinexkcd.config.BotConfig
-import me.ex0ns.inlinexkcd.database.{Comics, Groups}
-import me.ex0ns.inlinexkcd.database.Comics.DuplicatedComic
-import me.ex0ns.inlinexkcd.helpers.StringHelpers._
-import me.ex0ns.inlinexkcd.models.{Comic, Group}
-import me.ex0ns.inlinexkcd.parser.ComicParser
+import me.ex0ns.comicbot.config.BotConfig
+import me.ex0ns.comicbot.database.{Comics, Groups}
+import me.ex0ns.comicbot.database.Comics.DuplicatedComic
+import me.ex0ns.comicbot.helpers.StringHelpers._
+import me.ex0ns.comicbot.models.{Comic, Group}
+import me.ex0ns.comicbot.parser.ComicParser
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}

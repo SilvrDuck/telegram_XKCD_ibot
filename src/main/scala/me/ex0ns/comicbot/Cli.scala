@@ -1,4 +1,4 @@
-package me.ex0ns.inlinexkcd
+package me.ex0ns.comicbot
 
 object Cli {
 
@@ -12,13 +12,13 @@ object Cli {
 
   private val usage: String =
     """Usage:
-      |  inlinexkcd [--comic <name>] [parse [id]]
+      |  comicbot [--comic <name>] [parse [id]]
       |
       |Examples:
-      |  inlinexkcd
-      |  inlinexkcd --comic xkcd
-      |  inlinexkcd parse
-      |  inlinexkcd --comic xkcd parse 123
+      |  comicbot
+      |  comicbot --comic xkcd
+      |  comicbot parse
+      |  comicbot --comic xkcd parse 123
       |""".stripMargin
 
   def parse(args: Array[String]): Either[String, Parsed] = {

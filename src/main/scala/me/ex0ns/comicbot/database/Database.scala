@@ -1,4 +1,4 @@
-package me.ex0ns.inlinexkcd.database
+package me.ex0ns.comicbot.database
 
 import com.typesafe.scalalogging.Logger
 import org.mongodb.scala.MongoClient
@@ -10,6 +10,6 @@ trait Database {
   protected val PORT = envOrElse("DB_PORT", "27017")
 
   protected val mongoClient = MongoClient(s"mongodb://$URL:$PORT")
-  protected val database = mongoClient.getDatabase("comics")
+  protected val database = mongoClient.getDatabase("comicbot")
   protected val logger: Logger
 }

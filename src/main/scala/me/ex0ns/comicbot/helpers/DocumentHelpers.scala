@@ -1,6 +1,6 @@
-package me.ex0ns.inlinexkcd.helpers
+package me.ex0ns.comicbot.helpers
 
-import me.ex0ns.inlinexkcd.models.Comic
+import me.ex0ns.comicbot.models.Comic
 import org.mongodb.scala._
 import org.mongodb.scala.bson.{Document => _, _}
 

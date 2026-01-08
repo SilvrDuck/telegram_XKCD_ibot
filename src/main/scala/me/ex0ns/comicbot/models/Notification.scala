@@ -1,7 +1,7 @@
-package me.ex0ns.inlinexkcd.models
+package me.ex0ns.comicbot.models
 
 import com.bot4s.telegram.api.RequestHandler
-import me.ex0ns.inlinexkcd.database.Groups
+import me.ex0ns.comicbot.database.Groups
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

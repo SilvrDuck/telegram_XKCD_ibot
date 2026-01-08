@@ -1,11 +1,11 @@
-package me.ex0ns.inlinexkcd.comics.xkcd
+package me.ex0ns.comicbot.comics.xkcd
 
 import com.typesafe.scalalogging.Logger
 import sttp.client3._
-import me.ex0ns.inlinexkcd.database.Comics
-import me.ex0ns.inlinexkcd.database.Comics.DuplicatedComic
-import me.ex0ns.inlinexkcd.models.Comic
-import me.ex0ns.inlinexkcd.parser.ComicParser
+import me.ex0ns.comicbot.database.Comics
+import me.ex0ns.comicbot.database.Comics.DuplicatedComic
+import me.ex0ns.comicbot.models.Comic
+import me.ex0ns.comicbot.parser.ComicParser
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext.Implicits.global

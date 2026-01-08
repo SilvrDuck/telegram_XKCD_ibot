@@ -1,7 +1,7 @@
-package me.ex0ns.inlinexkcd.database
+package me.ex0ns.comicbot.database
 
 import com.typesafe.scalalogging.Logger
-import me.ex0ns.inlinexkcd.models.Group
+import me.ex0ns.comicbot.models.Group
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
 import org.mongodb.scala.MongoCollection
 import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY

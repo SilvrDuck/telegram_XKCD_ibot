@@ -1,7 +1,7 @@
-# XKCD Bot
+# Comic Bot
 
-XKCDBot is a [Telegram](https://telegram.org) bot, made in scala using the [telegrambot4s](https://github.com/mukel/telegrambot4s) library.
-The goal is to send/share XKCD comics in a easier way.
+ComicBot is a [Telegram](https://telegram.org) bot, made in scala using the [telegrambot4s](https://github.com/mukel/telegrambot4s) library.
+The goal is to send/share comics in an easier way from various comic sources.
 
 ### Installation && build
 
@@ -9,13 +9,13 @@ You obviously need Scala and SBT to make it run.
 
 All you need to make it run is a mongoDB server (> 3.x) and a [Telegram Bot key](https://core.telegram.org/bots), this token must be placed into a `telegram.key` file at the root of the project.
 
-The first step is to fill the database:
+The first step is to fill the database (defaults to xkcd comics, see advanced usage below):
 
 ```
 sbt 'run parse'
 ```
 
-This will create a database called 'xkcd' and a 'comics' collection within it.
+This will create a database called 'comicbot' with 'strips' and 'groups' collections within it.
 
 
 Then you can run the bot using ```sbt run``` with no parameters.
@@ -40,8 +40,8 @@ sbt 'run --comic xkcd parse 123'
 
 ### Features
 
-You can search and post XKCD comics using the inline features of the bot ```@xkcdibot search```. If `search` is empty, 
-then it will display the latest XKCD (ordered by date). 
+You can search and post comics using the inline features of the bot ```@name_of_bot search```. If `search` is empty, 
+then it will display the latest comics (ordered by date). 
 Currently, the number of results is limiter to 50.
 
 To enable the inline search for your bot, do the following:
@@ -85,12 +85,12 @@ The bot architecture supports multiple comic sources. To add a new comic source,
 
 #### Step 1: Create a Config File
 
-Create `src/main/scala/me/ex0ns/inlinexkcd/comics/<comic-name>/<ComicName>Config.scala`:
+Create `src/main/scala/me/ex0ns/comicbot/comics/<comic-name>/<ComicName>Config.scala`:
 
 ```scala
-package me.ex0ns.inlinexkcd.comics.xkcd
+package me.ex0ns.comicbot.comics.xkcd
 
-import me.ex0ns.inlinexkcd.config.BotConfig
+import me.ex0ns.comicbot.config.BotConfig
 
 object XKCDConfig {
   val config: BotConfig = BotConfig(
@@ -117,7 +117,7 @@ object XKCDConfig {
 }
 ```
 
-See full implementation: [XKCDConfig.scala](src/main/scala/me/ex0ns/inlinexkcd/comics/xkcd/XKCDConfig.scala)
+See full implementation: [XKCDConfig.scala](src/main/scala/me/ex0ns/comicbot/comics/xkcd/XKCDConfig.scala)
 
 #### Step 2: Create a Parser
 
@@ -133,13 +133,13 @@ The parser's job is to **fetch comic data from the source website and convert it
 - `transcript`: Full text transcript of the comic (useful for search)
 - `views`: Optional view count or popularity metric
 
-Create `src/main/scala/me/ex0ns/inlinexkcd/comics/<comic-name>/<ComicName>Parser.scala`:
+Create `src/main/scala/me/ex0ns/comicbot/comics/<comic-name>/<ComicName>Parser.scala`:
 
 ```scala
-package me.ex0ns.inlinexkcd.comics.xkcd
+package me.ex0ns.comicbot.comics.xkcd
 
-import me.ex0ns.inlinexkcd.parser.ComicParser
-import me.ex0ns.inlinexkcd.models.Comic
+import me.ex0ns.comicbot.parser.ComicParser
+import me.ex0ns.comicbot.models.Comic
 // ... other imports
 
 class XKCDParser extends ComicParser {
@@ -170,14 +170,14 @@ class XKCDParser extends ComicParser {
 }
 ```
 
-See full implementation: [XKCDParser.scala](src/main/scala/me/ex0ns/inlinexkcd/comics/xkcd/XKCDParser.scala)
+See full implementation: [XKCDParser.scala](src/main/scala/me/ex0ns/comicbot/comics/xkcd/XKCDParser.scala)
 
 #### Step 3: Register the Source
 
-Add your comic source to the `sources` map in [`main.scala`](src/main/scala/me/ex0ns/inlinexkcd/main.scala):
+Add your comic source to the `sources` map in [`main.scala`](src/main/scala/me/ex0ns/comicbot/main.scala):
 
 ```scala
-import me.ex0ns.inlinexkcd.comics.xkcd.{XKCDConfig, XKCDParser}
+import me.ex0ns.comicbot.comics.xkcd.{XKCDConfig, XKCDParser}
 
 val sources: Map[String, ComicSource] = Map(
   "xkcd" -> ComicSource(XKCDConfig.config, () => new XKCDParser())

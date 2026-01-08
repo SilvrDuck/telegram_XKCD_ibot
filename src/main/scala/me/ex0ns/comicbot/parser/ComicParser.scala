@@ -1,6 +1,6 @@
-package me.ex0ns.inlinexkcd.parser
+package me.ex0ns.comicbot.parser
 
-import me.ex0ns.inlinexkcd.models.Comic
+import me.ex0ns.comicbot.models.Comic
 
 import scala.concurrent.Future
 
