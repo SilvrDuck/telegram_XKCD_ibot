@@ -34,12 +34,18 @@ class XKCDParser extends ComicParser {
       case false =>
         basicRequest.get(uri"https://xkcd.com/$id/info.0.json")
           .send(backend)
-          .map(_.body)
-          .flatMap {
-            case Right(comic) => Comics.insert(comic).map(comic => Right(comic))
-            case Left(e) =>
-              logger.error(s"Unable to retrieve comic: $e")
-              Future.successful(Left(new Exception(s"Unable to retrieve comic: $e")))
+          .flatMap { response =>
+            if (response.code.code == 404) {
+              logger.debug(s"404 no new comic (tried $id)")
+              Future.successful(Left(new Exception("404")))
+            } else {
+              response.body match {
+                case Right(comic) => Comics.insert(comic).map(comic => Right(comic))
+                case Left(e) =>
+                  logger.error(s"Error retrieving comic $id: ${response.code}")
+                  Future.successful(Left(new Exception(s"HTTP ${response.code.code}")))
+              }
+            }
           }
     }
   }
@@ -54,15 +60,14 @@ class XKCDParser extends ComicParser {
       })
 
   /**
-    * Fetch in parallel size pages, starting from startingPage, and returns the number of failed Future
+    * Fetch in parallel size pages, starting from startingPage, and returns the number of failed parses
     */
   private def bulkFetch(startingPage: Int, size: Int) = {
     val t = Range(startingPage, startingPage + size)
       .take(size)
       .map(parseID)
-      .map(futureToFutureTry)
     val r = Await.result(Future.sequence(t), Duration.Inf)
-    r.count(_.isFailure)
+    r.count(_.isLeft)
   }
 
   /**
