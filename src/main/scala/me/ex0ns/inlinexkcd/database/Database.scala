@@ -10,6 +10,6 @@ trait Database {
   protected val PORT = envOrElse("DB_PORT", "27017")
 
   protected val mongoClient = MongoClient(s"mongodb://$URL:$PORT")
-  protected val database = mongoClient.getDatabase("xkcd")
+  protected val database = mongoClient.getDatabase("comics")
   protected val logger: Logger
 }

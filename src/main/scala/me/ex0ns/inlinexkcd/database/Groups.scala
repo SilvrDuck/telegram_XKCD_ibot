@@ -16,6 +16,7 @@ final object Groups extends Collection[Group] with Database {
   override def ct = implicitly
 
   final class InvalidGroupJSON extends Exception
+
   private val codecRegistry = fromRegistries(fromProviders(classOf[Group]), DEFAULT_CODEC_REGISTRY )
   private val codecDB = database.withCodecRegistry(codecRegistry)
 

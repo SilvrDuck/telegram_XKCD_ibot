@@ -15,16 +15,25 @@ final case class Comic(_id: Int,
                        num: Int,
                        alt: Option[String],
                        link: Option[String],
+                       transcript: Option[String],
                        views: Option[Int])
   extends Notification {
   def getBoldTitle: String = title.bold
 
-  def getText: String =
-    alt.getOrElse("") +
-      link.map(x => s"\n\n$x").getOrElse("") +
-      s"\n\nhttps://explainxkcd.com/$num"
+  override def notify(group: Group, noteTemplate: Option[String])(implicit request: RequestHandler[Future]): Future[Unit] = {
+    val formattedNote = noteTemplate match {
+      case Some(template) =>
+        template
+          .replace("{title}", title)
+          .replace("{alt}", alt.getOrElse(""))
+          .replace("{link}", link.getOrElse(""))
+          .replace("{num}", num.toString)
+          .replace("{img}", img)
+          .replace("{transcript}", transcript.getOrElse(""))
+      case None =>
+        alt.getOrElse("") + link.map(x => s"\n\n$x").getOrElse("")
+    }
 
-  override def notify(group: Group)(implicit request: RequestHandler[Future]): Future[Unit] = {
     for {
       response <- Future { scalaj.http.Http(img).asBytes }
       if response.isSuccess
@@ -34,7 +43,7 @@ final case class Comic(_id: Int,
       _ <- request(SendPhoto(group.id, photo))
       _ <- request(
         SendMessage(group.id,
-          getText,
+          formattedNote,
           Some(ParseMode.Markdown),
           disableWebPagePreview = Some(true)))
     } yield ()

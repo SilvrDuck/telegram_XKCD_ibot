@@ -9,11 +9,12 @@ import com.bot4s.telegram.models._
 import fs2.Stream
 import sttp.client3._
 import sttp.client3.asynchttpclient.future.AsyncHttpClientFutureBackend
-import me.ex0ns.inlinexkcd.database.Comics.DuplicatedComic
+import me.ex0ns.inlinexkcd.config.BotConfig
 import me.ex0ns.inlinexkcd.database.{Comics, Groups}
+import me.ex0ns.inlinexkcd.database.Comics.DuplicatedComic
 import me.ex0ns.inlinexkcd.helpers.StringHelpers._
 import me.ex0ns.inlinexkcd.models.{Comic, Group}
-import me.ex0ns.inlinexkcd.parser.XKCDHttpParser
+import me.ex0ns.inlinexkcd.parser.ComicParser
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
@@ -23,15 +24,23 @@ import cron4s.Cron
 import eu.timepit.fs2cron.cron4s.Cron4sScheduler
 import cats.effect.unsafe.implicits.global
 
-class InlineXKCDBot(val token: String) extends TelegramBot with Commands[Future] with Polling  {
+class InlineComicBot(
+  val token: String,
+  config: BotConfig,
+  parser: ComicParser
+) extends TelegramBot with Commands[Future] with Polling  {
 
   implicit val backend: SttpBackend[Future, Any] = AsyncHttpClientFutureBackend()
   override val client: RequestHandler[Future] = new FutureSttpClient(token)
 
   private val me = Await.result(request(GetMe), Duration.Inf)
-  private val parser = new XKCDHttpParser()
 
   logger.debug("Bot is up and running !")
+
+  // Create search index for configured fields with weights
+  Comics.createSearchIndex(config.searchFields, config.searchWeights)
+  val weightsDisplay = config.searchWeights.map(_.toString).getOrElse("default (all equal)")
+  logger.debug(s"Created search index on fields: ${config.searchFields.mkString(", ")} with weights: $weightsDisplay")
 
   def parseComic(notify: Boolean = false): Future[Either[Exception, Comic]] = {
     val nextComic = for {
@@ -41,7 +50,7 @@ class InlineXKCDBot(val token: String) extends TelegramBot with Commands[Future]
 
     nextComic.flatMap {
       case Right(comic) =>
-        if(notify) comic.notifyAllGroups(request).flatMap(_ => parseComic(notify))
+        if(notify) comic.notifyAllGroups(config.noteTemplate)(request).flatMap(_ => parseComic(notify))
         else parseComic(notify)
       case Left(_ : DuplicatedComic) => parseComic(notify)
       case x @ Left(_) => Future.successful(x)
@@ -52,12 +61,12 @@ class InlineXKCDBot(val token: String) extends TelegramBot with Commands[Future]
   }
 
   Comics.empty.map {
-    case true => parser.parseAll()
+    case true => parser.parseAll(config.bulkFetchStep)
     case false => parseComic() // Parse comics we could have missed
   }
 
   val cronScheduler = Cron4sScheduler.systemDefault[IO]
-  val evenSeconds = Cron.unsafeParse("0 */15 9-23 * * ?")
+  val evenSeconds = Cron.unsafeParse(config.cronSchedule)
 
   val startParse = Stream.eval(IO(logger.debug("Calling parse")) *> IO(parseComic(true)))
   val scheduled = cronScheduler.awakeEvery(evenSeconds) >> startParse
@@ -98,9 +107,9 @@ class InlineXKCDBot(val token: String) extends TelegramBot with Commands[Future]
     message.text.foreach {
       case "/start" => Groups.insert(message.chat.id.toString)
       case "/stop" => Groups.remove(message.chat.id.toString)
-      case "/debug" => Comics.top().map(comics =>
-        comics.headOption match {
-          case Some(comic) => comic.notify(Group(23835217))(request)
+      case "/debug" => Comics.top().map(comicList =>
+        comicList.headOption match {
+          case Some(comic) => comic.notify(Group(message.chat.id), config.noteTemplate)(request)
           case _ =>
         })
       case "/stats" =>

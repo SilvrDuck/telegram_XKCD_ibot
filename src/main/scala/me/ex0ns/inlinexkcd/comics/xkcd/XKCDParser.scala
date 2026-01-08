@@ -1,10 +1,11 @@
-package me.ex0ns.inlinexkcd.parser
+package me.ex0ns.inlinexkcd.comics.xkcd
 
 import com.typesafe.scalalogging.Logger
 import sttp.client3._
 import me.ex0ns.inlinexkcd.database.Comics
 import me.ex0ns.inlinexkcd.database.Comics.DuplicatedComic
 import me.ex0ns.inlinexkcd.models.Comic
+import me.ex0ns.inlinexkcd.parser.ComicParser
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -13,10 +14,10 @@ import scala.concurrent.{Await, Future}
 import scala.util.{Failure, Success, Try}
 import sttp.client3.asynchttpclient.future.AsyncHttpClientFutureBackend
 
-class XKCDHttpParser {
+class XKCDParser extends ComicParser {
 
   private val backend = AsyncHttpClientFutureBackend()
-  private val logger = Logger(LoggerFactory.getLogger(classOf[XKCDHttpParser]))
+  private val logger = Logger(LoggerFactory.getLogger(classOf[XKCDParser]))
 
   /**
     * Fetch XKCD comic based on its ID
@@ -29,14 +30,14 @@ class XKCDHttpParser {
     document.flatMap {
       case true =>
         logger.debug(s"Document with id: $id already exists")
-        Future.successful(Left(new DuplicatedComic)) // we do not want to stop at the first item we have in the DB
+        Future.successful(Left(new DuplicatedComic))
       case false =>
         basicRequest.get(uri"https://xkcd.com/$id/info.0.json")
           .send(backend)
           .map(_.body)
-          .flatMap { 
+          .flatMap {
             case Right(comic) => Comics.insert(comic).map(comic => Right(comic))
-            case Left(e) => 
+            case Left(e) =>
               logger.error(s"Unable to retrieve comic: $e")
               Future.successful(Left(new Exception(s"Unable to retrieve comic: $e")))
           }
@@ -45,9 +46,6 @@ class XKCDHttpParser {
 
   /**
     * Convert a Future[T] to Future[Try] to be able to count the number of failed/successful Future
-    * See http://stackoverflow.com/questions/20874186/scala-listfuture-to-futurelist-disregarding-failed-futures
-    * @param f The future to convert
-    * @return A future of Try
     */
   private def futureToFutureTry[T](f: Future[T]): Future[Try[T]] =
     f.map(Success(_))
@@ -57,9 +55,6 @@ class XKCDHttpParser {
 
   /**
     * Fetch in parallel size pages, starting from startingPage, and returns the number of failed Future
-    * @param startingPage Index of the starting page
-    * @param size The size of the range
-    * @return the number of failed Future
     */
   private def bulkFetch(startingPage: Int, size: Int) = {
     val t = Range(startingPage, startingPage + size)
@@ -72,7 +67,6 @@ class XKCDHttpParser {
 
   /**
     * Fetch and parse all XKCD comics
-    * @param step The number of pages to fetch in parallel
     */
   def parseAll(step: Int = 10): Stream[Int] = {
     Stream
