@@ -1,7 +1,6 @@
 services:
   inline-xkcd:
     build:
-      context: ..
       dockerfile: Dockerfile
     environment:
       DB_URL: db
