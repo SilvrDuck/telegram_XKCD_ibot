@@ -1,6 +1,6 @@
-package me.ex0ns.inlinexkcd.helpers
+package me.ex0ns.comicbot.helpers
 
-import me.ex0ns.inlinexkcd.models.Comic
+import me.ex0ns.comicbot.models.Comic
 import org.mongodb.scala._
 import org.mongodb.scala.bson.{Document => _, _}
 
@@ -21,10 +21,13 @@ object DocumentHelpers {
         val link = document
           .get[BsonString]("link")
           .flatMap(x => stringToOption(x.getValue))
+        val transcript = document
+          .get[BsonString]("transcript")
+          .flatMap(x => stringToOption(x.getValue))
         val views = document
           .get[BsonNumber]("views")
           .flatMap(x => { Some(x.intValue()) })
-        Comic(num, title, img, num, alt, link, views)
+        Comic(num, title, img, num, alt, link, transcript, views)
       }
     }
   }

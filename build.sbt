@@ -1,6 +1,6 @@
 import scala.io.Source
 
-name := "InlineXKCD"
+name := "ComicBot"
 organization := "ex0ns"
 version := "0.1"
 scalaVersion := "2.13.6"

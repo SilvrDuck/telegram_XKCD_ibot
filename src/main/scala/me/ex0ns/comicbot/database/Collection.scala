@@ -1,4 +1,4 @@
-package me.ex0ns.inlinexkcd.database
+package me.ex0ns.comicbot.database
 
 import org.mongodb.scala._
 import org.mongodb.scala.model.Filters._

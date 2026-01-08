@@ -1,4 +1,4 @@
-package me.ex0ns.inlinexkcd.models
+package me.ex0ns.comicbot.models
 
 import org.mongodb.scala.bson.ObjectId
 

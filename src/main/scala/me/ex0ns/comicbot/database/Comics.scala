@@ -1,8 +1,8 @@
-package me.ex0ns.inlinexkcd.database
+package me.ex0ns.comicbot.database
 
 import com.typesafe.scalalogging.Logger
-import me.ex0ns.inlinexkcd.helpers.DocumentHelpers._
-import me.ex0ns.inlinexkcd.models.Comic
+import me.ex0ns.comicbot.helpers.DocumentHelpers._
+import me.ex0ns.comicbot.models.Comic
 import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
 import org.mongodb.scala._
 import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
@@ -24,13 +24,31 @@ final object Comics extends Collection[Comic] with Database {
   private val codecRegistry = fromRegistries(fromProviders(classOf[Comic]), DEFAULT_CODEC_REGISTRY)
   private val codecDB = database.withCodecRegistry(codecRegistry)
 
-  override val collection: MongoCollection[Comic] = codecDB.getCollection("comics")
+  override val collection: MongoCollection[Comic] = codecDB.getCollection("strips")
   override val logger = Logger(LoggerFactory.getLogger(Comics.getClass))
 
-  collection
-    .createIndex(
-      Document("transcript" -> "text", "title" -> "text", "alt" -> "text", "views" -> "int"))
-    .head()
+  /**
+    * Create text search index on specified fields with weights
+    * @param fields Field names to index for text search (e.g., Seq("title", "alt"))
+    * @param weights Optional weight for each field (higher = more important). If None, all fields have equal weight (1).
+    */
+  def createSearchIndex(fields: Seq[String], weights: Option[Map[String, Int]]): Unit = {
+    if (fields.nonEmpty) {
+      // Build map of field -> "text" for text search index
+      val indexMap = fields.map(_ -> "text").toMap
+      val indexDoc = Document(indexMap)
+
+      // Create weights document for index options
+      // If weights not provided, all fields gety equal weight (1)
+      val weightsMap = weights.getOrElse(fields.map(_ -> 1).toMap)
+      val weightsDoc = Document(weightsMap.map { case (k, v) => k -> v })
+
+      collection.createIndex(indexDoc, model.IndexOptions().weights(weightsDoc)).head()
+    }
+
+    // Create descending index on views for sorting (used by top() method)
+    collection.createIndex(Document("views" -> -1)).head()
+  }
 
   /**
     * Inserts a comic given its description (JSON based)
