@@ -10,6 +10,9 @@ import scala.concurrent.Future
   * Implementations should handle:
   *   - HTTP requests to comic source API/website
   *   - Parsing response data into Comic model
+  *   - Properly wrapping the `alt` field as `MdV2Text`:
+  *     - Use `MdV2Text.Plain` for plain text (will be escaped for MarkdownV2)
+  *     - Use `MdV2Text.Formatted` for already-MarkdownV2 formatted content (e.g., from HtmlToMarkdownV2)
   *
   * Good practices that should also be considered:
   *   - Duplicate detection and error handling

@@ -2,16 +2,26 @@ package me.ex0ns.comicbot.helpers
 
 object StringHelpers {
 
-  implicit class MarkdownString(string: String) {
-    def bold = s"*$string*"
-    def italic = s"_${string}_"
-    def urlWithAlt(alt: String) = s"[$alt](${safeMDUrl(string)})"
-    def altWithUrl(url: String) = s"[$string](${safeMDUrl(url)})"
-    def inlineCode = s"`$string`"
-    def blockCode = s"```$string```"
+  private def escapeMdV2(s: String): String = {
+    val specialChars = "_*[]()~`>#+-=|{}.!"
+    s.replace("\\", "\\\\")
+      .flatMap { c =>
+        if (specialChars.contains(c)) s"\\$c"
+        else c.toString
+      }
   }
 
-  private def safeMDUrl(url: String) : String =
-    Seq("\\(" -> "%28", "\\)" -> "%29").foldLeft(url) { case (z, (s,r)) => z.replaceAll(s, r) }
+  implicit class MarkdownString(string: String) {
+    def escaped: String = escapeMdV2(string)
+    def bold: String = s"*${escapeMdV2(string)}*"
+    def italic: String = s"_${escapeMdV2(string)}_"
+    def urlWithAlt(alt: String): String = s"[${escapeMdV2(alt)}](${safeMdV2Url(string)})"
+    def altWithUrl(url: String): String = s"[${escapeMdV2(string)}](${safeMdV2Url(url)})"
+    def inlineCode: String = s"`$string`"
+    def blockCode: String = s"```$string```"
+  }
+
+  def safeMdV2Url(url: String): String =
+    url.replace("\\", "\\\\").replace(")", "\\)")
 
 }

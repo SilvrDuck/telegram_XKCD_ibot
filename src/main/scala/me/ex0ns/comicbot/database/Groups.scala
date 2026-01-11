@@ -26,15 +26,20 @@ final object Groups extends Collection[Group] with Database {
   /**
     * Insert a new group to the database
     *
+    * @param group the Group object to insert
+    */
+  override def insert(group: Group): Future[Group] = {
+    collection.insertOne(group).head().map(_ => group)
+  }
+
+  /**
+    * Insert a new group to the database by ID
+    *
     * @param groupId the ID of the group
     */
-  override def insert(groupId: String) : Future[Group] = {
-    val group: Group = Group(groupId.toLong) // Handle failure
-
-    collection
-      .insertOne(group)
-      .head()
-      .map(_ => group)
+  def insertById(groupId: String): Future[Group] = {
+    val group = Group(groupId.toLong)
+    insert(group)
   }
 
   /**

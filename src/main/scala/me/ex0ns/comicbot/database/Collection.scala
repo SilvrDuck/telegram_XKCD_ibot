@@ -16,9 +16,9 @@ trait Collection[R] {
   /**
     * Insert a new document into the database
     *
-    * @param obj the document to insert (String representation)
+    * @param obj the document to insert
     */
-  def insert(obj: String): Future[R]
+  def insert(obj: R): Future[R]
 
   /**
     * Retrieve a document given and ID

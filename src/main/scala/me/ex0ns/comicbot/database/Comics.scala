@@ -1,9 +1,8 @@
 package me.ex0ns.comicbot.database
 
 import com.typesafe.scalalogging.Logger
-import me.ex0ns.comicbot.helpers.DocumentHelpers._
-import me.ex0ns.comicbot.models.Comic
-import org.bson.codecs.configuration.CodecRegistries.{fromProviders, fromRegistries}
+import me.ex0ns.comicbot.models.{Comic, MdV2}
+import org.bson.codecs.configuration.CodecRegistries.{fromCodecs, fromProviders, fromRegistries}
 import org.mongodb.scala._
 import org.mongodb.scala.bson.codecs.DEFAULT_CODEC_REGISTRY
 import org.mongodb.scala.bson.codecs.Macros._
@@ -18,10 +17,13 @@ import scala.concurrent.Future
 final object Comics extends Collection[Comic] with Database {
   override def ct = implicitly
 
-  final class InvalidComicJSON extends Exception
   final class DuplicatedComic extends Exception
 
-  private val codecRegistry = fromRegistries(fromProviders(classOf[Comic]), DEFAULT_CODEC_REGISTRY)
+  private val codecRegistry = fromRegistries(
+    fromCodecs(new MdV2.MdV2Codec()),
+    fromProviders(classOf[Comic]),
+    DEFAULT_CODEC_REGISTRY
+  )
   private val codecDB = database.withCodecRegistry(codecRegistry)
 
   override val collection: MongoCollection[Comic] = codecDB.getCollection("strips")
@@ -51,25 +53,12 @@ final object Comics extends Collection[Comic] with Database {
   }
 
   /**
-    * Inserts a comic given its description (JSON based)
-    * The JSON must contain at least the following attributes:
-    *   - img
-    *   - title
-    *   - num
+    * Inserts a comic into the database
     *
-    * @param obj the JSON of the strip to insert
+    * @param comic the Comic object to insert
     */
-  override def insert(obj: String) : Future[Comic] = {
-    val document = Document(obj)
-    val comic = document.toComic
-    comic match {
-      case Some(comic) =>
-        collection
-          .insertOne(comic)
-          .head()
-          .map(_ => comic)
-      case None => Future.failed(new InvalidComicJSON)
-    }
+  override def insert(comic: Comic): Future[Comic] = {
+    collection.insertOne(comic).head().map(_ => comic)
   }
 
   /**
