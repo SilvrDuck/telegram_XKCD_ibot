@@ -14,6 +14,10 @@ libraryDependencies ++= Seq(
   "com.softwaremill.sttp.client3" %% "async-http-client-backend-future" % "3.3.17",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.3",
   "eu.timepit" %% "fs2-cron-cron4s" % "0.7.1",
+  "org.jsoup" % "jsoup" % "1.17.2",
+  "io.circe" %% "circe-core" % "0.14.9",
+  "io.circe" %% "circe-generic" % "0.14.9",
+  "io.circe" %% "circe-parser" % "0.14.9",
 )
 
 enablePlugins(DockerPlugin)

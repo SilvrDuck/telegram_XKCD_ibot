@@ -94,7 +94,7 @@ class InlineComicBot(
     message.newChatMembers.foreach(users => users
       .filter((user) => user.id == me.id)
       .foreach(_ => {
-        Groups.insert(message.chat.id.toString)
+        Groups.insertById(message.chat.id.toString)
       })
     )
 
@@ -105,7 +105,7 @@ class InlineComicBot(
       })
 
     message.text.foreach {
-      case "/start" => Groups.insert(message.chat.id.toString)
+      case "/start" => Groups.insertById(message.chat.id.toString)
       case "/stop" => Groups.remove(message.chat.id.toString)
       case "/debug" => Comics.top().map(comicList =>
         comicList.headOption match {
@@ -115,7 +115,7 @@ class InlineComicBot(
       case "/stats" =>
         Comics.top().map(cs => {
           val text = cs.map(c => s"${c.title.altWithUrl(c.img)} - ${c.views} views\n").mkString
-          request(SendMessage(message.chat.id, "Top 5 comics".bold + "\n" + text, Some(ParseMode.Markdown), disableWebPagePreview = Some(true)))
+          request(SendMessage(message.chat.id, "Top 5 comics".bold + "\n" + text, Some(ParseMode.MarkdownV2), disableWebPagePreview = Some(true)))
         })
     }
     superFuture
